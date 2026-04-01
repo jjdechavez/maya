@@ -5,7 +5,7 @@ import { consola } from "consola";
 import chokidar from "chokidar";
 import { listen, type Listener } from "listhen";
 import { toNodeHandler, type EventHandler } from "h3";
-import { resolve, dirname, join } from "node:path";
+import { resolve, dirname } from "node:path";
 import {
   bootLog,
   createMayaApp,
@@ -16,7 +16,6 @@ import {
 } from "./index.js";
 import { resolveServerOptions } from "./cli/resolve.js";
 
-const defaultConfigGlobs = ["maya.config.*", "routes/**"];
 const defaultStartExtensions = new Set([".js", ".mjs", ".cjs"]);
 
 function createResolver(cwd: string, moduleCache: boolean) {
@@ -169,26 +168,24 @@ async function runDev(args: Record<string, string | boolean | undefined>) {
 
   await start();
 
-  const cwd = process.cwd()
+  const cwd = process.cwd();
   const configArgs = typeof args.config === "string" ? args.config : undefined;
 
-  const watchGlobs = (() => {
-    if (!configArgs) {
-      return defaultConfigGlobs
-    }
+  let watchTargets: string[] = [
+    resolve(cwd, "maya.config.ts"),
+    resolve(cwd, "maya.config.mts"),
+    resolve(cwd, "maya.config.cts"),
+    resolve(cwd, "routes")
+  ];
 
-    const configFile = resolve(cwd, configArgs)
-    const configDir = dirname(configFile)
+  if (configArgs) {
+    const configFile = resolve(cwd, configArgs);
+    const configDir = dirname(configFile);
+    watchTargets = [configFile, resolve(configDir, "routes")];
+  }
 
-    return [
-      configFile,
-      join(configDir, "routes/**")
-    ]
-  })()
-
-  const watcher = chokidar.watch(watchGlobs, {
-    cwd,
-    ignoreInitial: true
+  const watcher = chokidar.watch(watchTargets, {
+    ignoreInitial: true,
   });
 
   watcher.on("all", async () => {
