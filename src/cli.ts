@@ -4,9 +4,16 @@ import { createJiti } from "jiti";
 import { consola } from "consola";
 import chokidar from "chokidar";
 import { listen, type Listener } from "listhen";
-import { toNodeListener, type EventHandler } from "h3";
+import { toNodeHandler, type EventHandler } from "h3";
 import { resolve } from "node:path";
-import { bootLog, createMayaApp, loadMayaConfig, type MayaConfig } from "./index.js";
+import {
+  bootLog,
+  createMayaApp,
+  createShutdownHooks,
+  loadMayaConfig,
+  runBeforeClose,
+  type MayaConfig
+} from "./index.js";
 import { resolveServerOptions } from "./cli/resolve.js";
 
 const defaultConfigGlobs = ["maya.config.*", "routes/**"];
@@ -69,7 +76,7 @@ async function resolveMiddlewareHandlers(
 async function startServer(
   args: Record<string, string | boolean | undefined>,
   mode: "dev" | "production"
-): Promise<Listener> {
+): Promise<{ listener: Listener; config: MayaConfig }> {
   const cwd = process.cwd();
   const moduleCache = mode === "production";
   const resolver = createResolver(cwd, moduleCache);
@@ -97,7 +104,7 @@ async function startServer(
   );
 
   const app = createMayaApp(resolvedConfig);
-  const listener = await listen(toNodeListener(app), {
+  const listener = await listen(toNodeHandler(app), {
     port,
     hostname: host,
     showURL: false,
@@ -116,13 +123,15 @@ async function startServer(
     consola.info(`Loaded config: ${configFile}`);
   }
 
-  return listener;
+  return { listener, config: resolvedConfig };
 }
 
 async function runDev(args: Record<string, string | boolean | undefined>) {
   let listener: Listener | undefined;
+  let config: MayaConfig | undefined;
   let restarting = false;
   let pendingRestart = false;
+  let shuttingDown = false;
 
   async function stop() {
     if (listener) {
@@ -132,7 +141,9 @@ async function runDev(args: Record<string, string | boolean | undefined>) {
   }
 
   async function start() {
-    listener = await startServer(args, "dev");
+    const result = await startServer(args, "dev");
+    listener = result.listener;
+    config = result.config;
   }
 
   async function restart() {
@@ -167,8 +178,24 @@ async function runDev(args: Record<string, string | boolean | undefined>) {
   });
 
   const shutdown = async () => {
+    if (shuttingDown) {
+      return;
+    }
+
+    shuttingDown = true;
+    const hooks = createShutdownHooks(config ?? {});
+    const timeoutMs = config?.shutdownTimeoutMs ?? 10000;
+    consola.info("🕊️ Maya is landing... running shutdown hooks.");
+    await runBeforeClose(hooks, {
+      timeoutMs,
+      onTimeout: () => {
+        consola.warn(`Shutdown hooks timed out after ${timeoutMs}ms.`);
+      }
+    });
+
     await watcher.close();
     await stop();
+    consola.info("🕊️ Maya shutdown complete.");
     process.exit(0);
   };
 
@@ -177,7 +204,32 @@ async function runDev(args: Record<string, string | boolean | undefined>) {
 }
 
 async function runStart(args: Record<string, string | boolean | undefined>) {
-  await startServer(args, "production");
+  const { listener, config } = await startServer(args, "production");
+  let shuttingDown = false;
+
+  const shutdown = async () => {
+    if (shuttingDown) {
+      return;
+    }
+
+    shuttingDown = true;
+    const hooks = createShutdownHooks(config ?? {});
+    const timeoutMs = config.shutdownTimeoutMs ?? 10000;
+    consola.info("🕊️ Maya is landing... running shutdown hooks.");
+    await runBeforeClose(hooks, {
+      timeoutMs,
+      onTimeout: () => {
+        consola.warn(`Shutdown hooks timed out after ${timeoutMs}ms.`);
+      }
+    });
+
+    await listener.close();
+    consola.info("🕊️ Maya shutdown complete.");
+    process.exit(0);
+  };
+
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 }
 
 const command = defineCommand({

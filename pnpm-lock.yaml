@@ -23,6 +23,9 @@ importers:
       h3:
         specifier: 2.0.1-rc.20
         version: 2.0.1-rc.20
+      hookable:
+        specifier: ^6.1.0
+        version: 6.1.0
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
@@ -943,6 +946,9 @@ packages:
 
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
+
+  hookable@6.1.0:
+    resolution: {integrity: sha512-ZoKZSJgu8voGK2geJS+6YtYjvIzu9AOM/KZXsBxr83uhLL++e9pEv/dlgwgy3dvHg06kTz6JOh1hk3C8Ceiymw==}
 
   http-shutdown@1.2.2:
     resolution: {integrity: sha512-S9wWkJ/VSY9/k4qcjG318bqJNruzE4HySUhFYknwmu6LBP97KLLfwNf+n4V1BHurvFNkSKLFnK/RsuUnRTf9Vw==}
@@ -2365,6 +2371,8 @@ snapshots:
       function-bind: 1.1.2
 
   hookable@5.5.3: {}
+
+  hookable@6.1.0: {}
 
   http-shutdown@1.2.2: {}
 

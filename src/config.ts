@@ -14,6 +14,7 @@ export interface MayaRoute {
 
 export interface MayaConfig {
   port?: number;
+  shutdownTimeoutMs?: number;
   onBeforeClose?: () => Awaitable<void>;
   middleware?: MayaMiddleware[];
   routes?: MayaRoute[];
