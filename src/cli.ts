@@ -5,7 +5,7 @@ import { consola } from "consola";
 import chokidar from "chokidar";
 import { listen, type Listener } from "listhen";
 import { toNodeHandler, type EventHandler } from "h3";
-import { resolve } from "node:path";
+import { resolve, dirname, join } from "node:path";
 import {
   bootLog,
   createMayaApp,
@@ -168,8 +168,25 @@ async function runDev(args: Record<string, string | boolean | undefined>) {
 
   await start();
 
-  const watcher = chokidar.watch(defaultConfigGlobs, {
-    cwd: process.cwd(),
+  const cwd = process.cwd()
+  const configArgs = typeof args.config === "string" ? args.config : undefined;
+
+  const watchGlobs = (() => {
+    if (!configArgs) {
+      return defaultConfigGlobs
+    }
+
+    const configFile = resolve(cwd, configArgs)
+    const configDir = dirname(configFile)
+
+    return [
+      configFile,
+      join(configDir, "routes/**")
+    ]
+  })()
+
+  const watcher = chokidar.watch(watchGlobs, {
+    cwd,
     ignoreInitial: true
   });
 
