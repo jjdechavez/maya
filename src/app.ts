@@ -29,7 +29,10 @@ function resolveMiddleware(handler: EventHandler | Middleware | string): Middlew
   return middleware;
 }
 
-export function createMayaApp(config: MayaConfig): H3 {
+export function createMayaApp(
+  config: MayaConfig,
+  options: { baseDir?: string } = {}
+): H3 {
   const app = new H3();
 
   const health = config.health ?? { enabled: true };
@@ -41,7 +44,7 @@ export function createMayaApp(config: MayaConfig): H3 {
     const publicPath = config.publicPath ?? "/public";
     const publicDir = isAbsolute(config.publicDir)
       ? config.publicDir
-      : resolve(process.cwd(), config.publicDir);
+      : resolve(options.baseDir ?? process.cwd(), config.publicDir);
     const handler = withBase(publicPath, (event) =>
       serveStatic(event, {
         getMeta: async (id) => resolveStaticMeta(publicDir, id),
@@ -51,6 +54,7 @@ export function createMayaApp(config: MayaConfig): H3 {
     const matchPath = publicPath.endsWith("/")
       ? `${publicPath}**`
       : `${publicPath}/**`;
+
     app.use(matchPath, handler);
   }
 

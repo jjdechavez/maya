@@ -85,6 +85,7 @@ async function startServer(
     configFile: typeof args.config === "string" ? args.config : undefined,
     import: (id) => resolver.import(id)
   });
+  const configDir = configFile ? dirname(configFile) : cwd;
 
   const { port, host } = resolveServerOptions(
     {
@@ -102,7 +103,7 @@ async function startServer(
     mode === "dev"
   );
 
-  const app = createMayaApp(resolvedConfig);
+  const app = createMayaApp(resolvedConfig, { baseDir: configDir });
   const listener = await listen(toNodeHandler(app), {
     port,
     hostname: host,
