@@ -176,6 +176,7 @@ Optional flags:
 
 - `--minify`
 - `--sourcemap=true|inline|external`
+- `--target=node20|node22|node24`
 - `--clean`
 
 Start from the compiled output:

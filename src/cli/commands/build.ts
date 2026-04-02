@@ -31,6 +31,11 @@ export default defineCommand({
       type: "string",
       description: "Generate sourcemaps (true, inline, external)",
       default: "false"
+    },
+    target: {
+      type: "string",
+      description: "Node target for esbuild (e.g. node20, node22, node24)",
+      default: "node24"
     }
   },
   run: async ({ args }) => {
@@ -41,7 +46,8 @@ export default defineCommand({
       outDir: typeof args.outDir === "string" ? args.outDir : "dist",
       clean: Boolean(args.clean),
       minify: Boolean(args.minify),
-      sourcemap
+      sourcemap,
+      target: typeof args.target === "string" ? args.target : "node18"
     });
 
     consola.success(`Built Maya app at ${result.outDir}`);

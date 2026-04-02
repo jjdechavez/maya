@@ -21,6 +21,7 @@ export interface BuildOptions {
   clean: boolean;
   minify?: boolean;
   sourcemap?: boolean | "inline" | "external";
+  target?: string;
 }
 
 export async function buildProject(options: BuildOptions) {
@@ -57,7 +58,7 @@ export async function buildProject(options: BuildOptions) {
     splitting: true,
     format: "esm",
     platform: "node",
-    target: "node18",
+    target: options.target ?? "node24",
     packages: "external",
     sourcemap: options.sourcemap ?? false,
     minify: options.minify ?? false,
