@@ -2,6 +2,87 @@
 
 Lightweight micro-engine for explicit h3-based servers.
 
+maya.config.ts
+
+```ts
+import { defineMayaConfig } from "maya";
+import { defineEventHandler } from "h3";
+
+const hello = defineEventHandler(() => ({ ok: true }));
+
+export default defineMayaConfig({
+  port: 5555,
+  routesBasePath: "/api",
+  routes: [
+    { method: "GET", path: "/hello", handler: hello }
+  ],
+  publicDir: "public",
+  publicPath: "/public",
+  health: { enabled: true, path: "/health" },
+  shutdownTimeoutMs: 10000,
+  onBeforeClose() {
+    console.log("Maya is landing...");
+  }
+});
+```
+
+Config reference
+
+- `port: number` (default `3000`)
+  Port to listen on when running `maya dev` or `maya start`.
+- `routes: MayaRoute[]` (default `[]`)
+  Explicit routes with `{ method, path, handler, middleware? }`.
+- `routesBasePath: string` (default `""`)
+  Prefix added to all routes (e.g. `"/api"`).
+- `middleware: MayaMiddleware[]` (default `[]`)
+  Global middleware applied to all requests.
+- `publicDir: string | false` (default `false`)
+  Directory of static assets to serve. Disabled when `false` or unset.
+- `publicPath: string` (default `"/public"`)
+  URL prefix for static assets.
+- `health: { enabled?: boolean; path?: string }` (default enabled, path `"/health"`)
+  Built-in health endpoint.
+- `shutdownTimeoutMs: number` (default `10000`)
+  Time limit for graceful shutdown hooks.
+- `onBeforeClose: () => void | Promise<void>`
+  Hook called before the server closes.
+
+Notes
+
+- Relative paths like `publicDir` resolve from the directory containing `maya.config.ts`.
+- Health is enabled by default; disable with `health: { enabled: false }`.
+
+MayaRoute type
+
+```ts
+import type { EventHandler, Middleware, HTTPMethod } from "h3";
+
+type MayaRoute = {
+  method?: "ALL" | HTTPMethod | Lowercase<HTTPMethod>;
+  path: string;
+  handler: EventHandler;
+  middleware?: Middleware[];
+};
+```
+
+Config patterns
+
+```ts
+// API-only
+export default defineMayaConfig({
+  routesBasePath: "/api",
+  routes: [{ method: "GET", path: "/ping", handler: ping }],
+  health: { enabled: true }
+});
+
+// Static-only
+export default defineMayaConfig({
+  publicDir: "public",
+  publicPath: "/public",
+  health: { enabled: false }
+});
+```
+
 Shutdown hooks
 
 Use `onBeforeClose` to run cleanup logic during a graceful shutdown. The CLI
