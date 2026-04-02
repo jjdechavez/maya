@@ -5,6 +5,8 @@ export default defineBuildConfig({
   declaration: true,
   clean: true,
   rollup: {
-    emitCJS: false
-  }
+    emitCJS: false,
+    external: ["esbuild"]
+  },
+  externals: ["esbuild"]
 });

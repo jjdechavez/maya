@@ -1,0 +1,62 @@
+import { defineCommand } from "citty";
+import consola from "consola";
+import { buildProject } from "../build.js";
+
+export default defineCommand({
+  meta: {
+    name: "build",
+    description: "Build Maya app for production"
+  },
+  args: {
+    config: {
+      type: "string",
+      description: "Path to maya config file"
+    },
+    outDir: {
+      type: "string",
+      description: "Output directory",
+      default: "dist"
+    },
+    clean: {
+      type: "boolean",
+      description: "Remove output directory before build",
+      default: false
+    },
+    minify: {
+      type: "boolean",
+      description: "Minify build output",
+      default: false
+    },
+    sourcemap: {
+      type: "string",
+      description: "Generate sourcemaps (true, inline, external)",
+      default: "false"
+    }
+  },
+  run: async ({ args }) => {
+    const sourcemap = parseSourcemap(args.sourcemap);
+    const result = await buildProject({
+      cwd: process.cwd(),
+      configFile: typeof args.config === "string" ? args.config : undefined,
+      outDir: typeof args.outDir === "string" ? args.outDir : "dist",
+      clean: Boolean(args.clean),
+      minify: Boolean(args.minify),
+      sourcemap
+    });
+
+    consola.success(`Built Maya app at ${result.outDir}`);
+  }
+});
+
+function parseSourcemap(value: string | undefined) {
+  if (!value || value === "false") {
+    return false;
+  }
+  if (value === "true") {
+    return true;
+  }
+  if (value === "inline" || value === "external") {
+    return value;
+  }
+  throw new Error(`Invalid sourcemap value: ${value}`);
+}

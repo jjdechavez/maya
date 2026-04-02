@@ -163,3 +163,28 @@ Notes:
 
 - Templates use `"maya": "workspace:*"` while developing locally to avoid the npm name collision.
 - For local workspace installs, set `node-linker=isolated` in `.npmrc` so each app gets a `node_modules/.bin`.
+
+Build & start
+
+Build a project into `dist/`:
+
+```sh
+maya build --outDir dist
+```
+
+Optional flags:
+
+- `--minify`
+- `--sourcemap=true|inline|external`
+- `--clean`
+
+Start from the compiled output:
+
+```sh
+NODE_ENV=production maya start --outDir dist
+```
+
+Notes:
+
+- `maya start` requires `dist/server.mjs`.
+- Use `--clean` with `maya build` to remove the output directory before building.

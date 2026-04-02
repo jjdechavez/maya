@@ -1,8 +1,7 @@
 import { defineCommand } from "citty";
-import consola from "consola";
-
-import { startServer } from "../../cli.js";
-import { createShutdownHooks, runBeforeClose } from "../../index.js";
+import { access } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import { resolve } from "node:path";
 
 export default defineCommand(
   {
@@ -19,39 +18,39 @@ export default defineCommand(
         type: "string",
         description: "Host to bind"
       },
-      config: {
+      outDir: {
         type: "string",
-        description: "Path to maya config file"
+        description: "Build output directory",
+        default: "dist"
       }
     },
     run: async ({ args }) => {
+      const outDir = typeof args.outDir === "string" ? args.outDir : "dist";
+      const serverPath = resolve(process.cwd(), outDir, "server.mjs");
 
-      const { listener, config } = await startServer(args, "production");
-      let shuttingDown = false;
+      try {
+        await access(serverPath);
+      } catch {
+        consola.error(`Build output not found at ${serverPath}. Run "maya build".`);
+        throw new Error("Missing build output.");
+      }
 
-      const shutdown = async () => {
-        if (shuttingDown) {
-          return;
-        }
+      const env = { ...process.env };
+      if (typeof args.port === "string") {
+        env.PORT = args.port;
+      }
+      if (typeof args.host === "string") {
+        env.HOST = args.host;
+      }
 
-        shuttingDown = true;
-        const hooks = createShutdownHooks(config ?? {});
-        const timeoutMs = config.shutdownTimeoutMs ?? 10000;
-        consola.info("🪶 Maya is landing... running shutdown hooks.");
-        await runBeforeClose(hooks, {
-          timeoutMs,
-          onTimeout: () => {
-            consola.warn(`Shutdown hooks timed out after ${timeoutMs}ms.`);
-          }
-        });
+      const child = spawn(process.execPath, [serverPath], {
+        stdio: "inherit",
+        env
+      });
 
-        await listener.close();
-        consola.info("🌿 Maya shutdown complete.");
-        process.exit(0);
-      };
-
-      process.on("SIGINT", shutdown);
-      process.on("SIGTERM", shutdown);
+      child.on("exit", (code) => {
+        process.exit(code ?? 0);
+      });
     }
   }
 )
