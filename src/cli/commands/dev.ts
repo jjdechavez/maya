@@ -101,7 +101,7 @@ export default defineCommand(
         shuttingDown = true;
         const hooks = createShutdownHooks(config ?? {});
         const timeoutMs = config?.shutdownTimeoutMs ?? 10000;
-        consola.info("🕊️ Maya is landing... running shutdown hooks.");
+        consola.info("🪶 Maya is landing... running shutdown hooks.");
         await runBeforeClose(hooks, {
           timeoutMs,
           onTimeout: () => {
@@ -111,7 +111,7 @@ export default defineCommand(
 
         await watcher.close();
         await stop();
-        consola.info("🕊️ Maya shutdown complete.");
+        consola.info("🌿 Maya shutdown complete.");
         process.exit(0);
       };
 
