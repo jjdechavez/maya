@@ -208,3 +208,13 @@ Start flags:
 - `--quiet`
 - `--health /healthz`
 - `--no-health`
+
+Config introspection
+
+Print resolved config (redacted by default):
+
+```sh
+maya config --env .env.production --showSources
+```
+
+Use `--raw` to print full values.

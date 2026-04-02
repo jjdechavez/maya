@@ -162,6 +162,7 @@ const command = defineCommand({
   },
   subCommands: {
     init: import("./cli/commands/init.js").then(r => r.default),
+    config: import("./cli/commands/config.js").then(r => r.default),
     dev: import("./cli/commands/dev.js").then(r => r.default),
     start: import("./cli/commands/start.js").then(r => r.default),
     build: import("./cli/commands/build.js").then(r => r.default)
