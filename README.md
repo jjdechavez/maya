@@ -140,6 +140,12 @@ export default defineMayaConfig({
 });
 ```
 
+Static assets pipeline
+
+- Maya does not minify public assets.
+- Build/minify assets into `public/` with your own tooling.
+- `maya build` copies `public/` into `dist/public/`.
+
 Examples
 
 - `examples/basic/README.md`
@@ -171,6 +177,11 @@ Build a project into `dist/`:
 ```sh
 maya build --outDir dist
 ```
+
+Asset pipeline example:
+
+- `pnpm run assets:build`
+- `maya build --outDir dist`
 
 Optional flags:
 

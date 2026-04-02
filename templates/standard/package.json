@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "maya dev",
+    "assets:build": "echo \"Add your asset build here\"",
     "build": "maya build",
     "start": "maya start"
   },
