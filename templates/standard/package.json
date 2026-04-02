@@ -1,0 +1,13 @@
+{
+  "name": "__NAME__",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "maya dev",
+    "build": "maya build",
+    "start": "maya start"
+  },
+  "dependencies": {
+    "maya": "workspace:*"
+  }
+}

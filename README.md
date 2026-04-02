@@ -145,3 +145,21 @@ Examples
 - `examples/basic/README.md`
 - `examples/static/README.md`
 - `examples/router/README.md`
+
+Scaffolding
+
+Create a new project:
+
+```sh
+maya init my-api --template minimal
+```
+
+Templates:
+
+- `minimal`
+- `standard`
+
+Notes:
+
+- Templates use `"maya": "workspace:*"` while developing locally to avoid the npm name collision.
+- For local workspace installs, set `node-linker=isolated` in `.npmrc` so each app gets a `node_modules/.bin`.

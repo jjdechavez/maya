@@ -15,7 +15,8 @@
     "maya": "./dist/cli.mjs"
   },
   "files": [
-    "dist"
+    "dist",
+    "templates"
   ],
   "scripts": {
     "build": "unbuild",

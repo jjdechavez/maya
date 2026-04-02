@@ -136,8 +136,9 @@ const command = defineCommand({
     description: "Maya CLI"
   },
   subCommands: {
+    init: import("./cli/commands/init.js").then(r => r.default),
     dev: import("./cli/commands/dev.js").then(r => r.default),
-    start: import("./cli/commands/start.js").then(r => r.default)
+    start: import("./cli/commands/start.js").then(r => r.default),
   }
 });
 
