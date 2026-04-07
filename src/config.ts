@@ -25,13 +25,15 @@ export interface TamsiConfig {
   host?: string;
   port?: number;
   routesBasePath?: string;
-  publicDir?: string | false;
-  publicPath?: string;
   health?: TamsiHealthOptions;
   shutdownTimeoutMs?: number;
   onBeforeClose?: () => Awaitable<void>;
-  middleware?: TamsiMiddleware[];
+  middlewares?: TamsiMiddleware[];
   routes?: TamsiRoute[];
+  serveStatic?: {
+    publicDir?: string | false;
+    publicPath?: string;
+  }
 }
 
 export function defineTamsiConfig<T extends TamsiConfig>(config: T): T {

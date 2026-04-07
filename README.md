@@ -13,6 +13,7 @@ import { defineEventHandler } from "h3";
 const hello = defineEventHandler(() => ({ ok: true }));
 
 export default defineTamsiConfig({
+  host: "localhost",
   port: 5555,
   routesBasePath: "/api",
   routes: [
@@ -30,13 +31,15 @@ export default defineTamsiConfig({
 
 #### Config reference
 
+- `host: string` (default `0.0.0.0`)
+  Host to listen on when running `tamsi dev` or `tamsi start`.
 - `port: number` (default `3000`)
   Port to listen on when running `tamsi dev` or `tamsi start`.
 - `routes: TamsiRoute[]` (default `[]`)
   Explicit routes with `{ method, path, handler, middleware? }`.
 - `routesBasePath: string` (default `""`)
   Prefix added to all routes (e.g. `"/api"`).
-- `middleware: TamsiMiddleware[]` (default `[]`)
+- `middlewares: TamsiMiddleware[]` (default `[]`)
   Global middleware applied to all requests.
 - `publicDir: string | false` (default `false`)
   Directory of static assets to serve. Disabled when `false` or unset.
@@ -63,7 +66,7 @@ type TamsiRoute = {
   method?: "ALL" | HTTPMethod | Lowercase<HTTPMethod>;
   path: string;
   handler: EventHandler;
-  middleware?: Middleware[];
+  middlewares?: Middleware[];
 };
 ```
 
@@ -107,7 +110,7 @@ export default defineTamsiConfig({
 
 ### Routing helpers
 
-Use `defineTamsiRouter` to group routes under a base path and shared middleware.
+Use `defineTamsiRouter` to group routes under a base path and shared middlewares.
 
 ```ts
 import { defineTamsiConfig, defineTamsiRouter } from "tamsi";

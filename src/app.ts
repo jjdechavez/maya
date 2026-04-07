@@ -40,11 +40,11 @@ export function createTamsiApp(
     app.get(health.path ?? "/health", () => ({ ok: true }));
   }
 
-  if (config.publicDir) {
-    const publicPath = config.publicPath ?? "/public";
-    const publicDir = isAbsolute(config.publicDir)
-      ? config.publicDir
-      : resolve(options.baseDir ?? process.cwd(), config.publicDir);
+  if (config.serveStatic?.publicDir) {
+    const publicPath = config.serveStatic.publicPath ?? "/public";
+    const publicDir = isAbsolute(config.serveStatic.publicDir)
+      ? config.serveStatic.publicDir
+      : resolve(options.baseDir ?? process.cwd(), config.serveStatic.publicDir);
     const handler = withBase(publicPath, async (event) => {
       const id = mapStaticId(event.url.pathname);
       const meta = await resolveStaticMeta(publicDir, id);
@@ -68,8 +68,8 @@ export function createTamsiApp(
     app.use(matchPath, handler);
   }
 
-  if (config.middleware) {
-    for (const item of config.middleware) {
+  if (config.middlewares) {
+    for (const item of config.middlewares) {
       const middleware = resolveMiddleware(item.handler);
       if (item.path) {
         app.use(item.path, middleware);
