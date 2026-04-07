@@ -1,10 +1,25 @@
 import { defineTamsiConfig } from "tamsi";
-import handler from "./routes/index";
 import { defineHandler } from "h3";
+import { randomUUID } from "node:crypto";
+
+import handler from "./routes/index.ts";
 
 export default defineTamsiConfig({
   port: 5555,
   shutdownTimeoutMs: 8000,
+  middlewares: [
+    {
+      handler: defineHandler((event) => {
+        const requestId = randomUUID()
+
+        event.context.requestId = requestId
+        event.res.headers.set("x-request-id", requestId);
+
+        console.log("Middleware 1")
+      })
+    },
+    { handler: defineHandler(() => console.log("Middleware 2")) }
+  ],
   routes: [
     {
       method: "GET",
@@ -16,8 +31,4 @@ export default defineTamsiConfig({
   onBeforeClose: () => {
     console.warn("Prepare for landing...")
   },
-  middlewares: [
-    { handler: defineHandler(() => console.log("Middleware 1")) },
-    { handler: defineHandler(() => console.log("Middleware 2")) }
-  ]
 });

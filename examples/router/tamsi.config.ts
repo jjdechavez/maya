@@ -1,5 +1,5 @@
 import { defineTamsiConfig, defineTamsiRouter } from "tamsi";
-import ping from "./routes/ping";
+import ping from "./routes/ping.ts";
 
 const routes = defineTamsiRouter({
   basePath: "/api",

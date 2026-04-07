@@ -1,5 +1,5 @@
 import { defineTamsiConfig } from "tamsi";
-import handler from "./routes/index";
+import handler from "./routes/index.ts";
 
 export default defineTamsiConfig({
   port: __PORT__,
