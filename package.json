@@ -1,6 +1,6 @@
 {
   "name": "tamsi",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Lightweight micro-engine for explicit h3-based servers.",
   "type": "module",
   "main": "./dist/index.mjs",
