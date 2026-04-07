@@ -2,8 +2,7 @@
 import { defineCommand, runMain } from "citty";
 import { createJiti } from "jiti";
 import { consola } from "consola";
-import { listen, type Listener } from "listhen";
-import { toNodeHandler, type EventHandler } from "h3";
+import { serve, type EventHandler } from "h3";
 import { resolve, dirname } from "node:path";
 import {
   bootLog,
@@ -28,12 +27,12 @@ async function resolveMiddlewareHandlers(
   resolver: ReturnType<typeof createResolver>,
   allowTs: boolean
 ): Promise<TamsiConfig> {
-  if (!config.middleware?.length) {
+  if (!config.middlewares?.length) {
     return config;
   }
 
-  const middleware = await Promise.all(
-    config.middleware.map(async (item) => {
+  const middlewares = await Promise.all(
+    config.middlewares.map(async (item) => {
       if (typeof item.handler !== "string") {
         return item;
       }
@@ -65,7 +64,7 @@ async function resolveMiddlewareHandlers(
 
   return {
     ...config,
-    middleware
+    middlewares
   };
 }
 
@@ -86,7 +85,7 @@ export async function startServer(
   args: TamsiServerStartupArgs,
   mode: "dev" | "production",
   options: TamsiServerOptions = {}
-): Promise<{ listener: Listener; config: TamsiConfig }> {
+): Promise<{ listener: ReturnType<typeof serve>; config: TamsiConfig }> {
   const cwd = process.cwd();
   const moduleCache = mode === "production";
   const resolver = createResolver(cwd, moduleCache);
@@ -116,13 +115,9 @@ export async function startServer(
   );
 
   const app = createTamsiApp(resolvedConfig, { baseDir: configDir });
-  const listener = await listen(toNodeHandler(app), {
+  const listener = serve(app, {
     port,
     hostname: host,
-    showURL: false,
-    name: "Tamsi",
-    isProd: mode === "production",
-    autoClose: false
   });
 
   const url = listener.url;
