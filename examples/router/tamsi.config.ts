@@ -1,10 +1,6 @@
-import { defineTamsiConfig, defineTamsiRouter } from "tamsi";
-import ping from "./routes/ping.ts";
+import { defineTamsiConfig } from "tamsi";
 
-const routes = defineTamsiRouter({
-  basePath: "/api",
-  routes: [{ method: "GET", path: "/ping", handler: ping }]
-});
+import { routes } from './src/app.ts'
 
 export default defineTamsiConfig({
   port: 5555,

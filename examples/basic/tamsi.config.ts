@@ -2,7 +2,7 @@ import { defineTamsiConfig } from "tamsi";
 import { defineHandler } from "h3";
 import { randomUUID } from "node:crypto";
 
-import handler from "./routes/index.ts";
+import handler from "./src/routes/index.ts";
 
 export default defineTamsiConfig({
   port: 5555,
