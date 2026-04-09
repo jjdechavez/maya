@@ -2,6 +2,124 @@
 
 Lightweight micro-engine for explicit h3-based servers.
 
+## Table of Contents
+
+- [Installation](#installation)
+- [CLI](#cli)
+- [Features](#features)
+  - [tamsi.config.ts](#tamsi.config.ts)
+  - [TamsiRoute](#tamsiroute-type)
+  - [Shutdown Hooks](#shutdown-hooks)
+  - [Routing Helpers](#routing-helpers)
+  - [Static files](#static-files)
+  - [Config introspection](#config-introspection)
+
+## Installation
+
+Use your favorite package manager npm, pnpm and etc.
+
+```
+pnpm add tamsi
+```
+
+## CLI
+
+Tamsi ships with a CLI for dev, build, and production start.
+
+### Common usage
+
+```sh
+tamsi init my-api --template minimal
+tamsi dev --env .env.local
+tamsi build --outDir dist
+tamsi start --outDir dist
+```
+
+### Commands
+
+#### init
+
+Create a new project from a template.
+
+```sh
+tamsi init my-api --template standard
+```
+
+Flags:
+
+- `--template minimal|standard` (default `minimal`)
+- `--force` overwrite if directory is not empty
+- `--cwd <path>` base directory to create the project in
+
+#### dev
+
+Start in development mode with file watching.
+
+```sh
+tamsi dev --port 5555 --host 0.0.0.0
+```
+
+Flags:
+
+- `--config <path>` path to config file
+- `--env <path>` path to env file (replaces default `.env`)
+- `--port <number>` port to listen on
+- `--host <string>` host to bind
+- `--quiet` reduce output to only the URL
+- `--health <path>` override health endpoint path
+- `--no-health` disable health endpoint
+
+#### build
+
+Build a production bundle to `dist/` (or `--outDir`).
+
+```sh
+tamsi build --outDir dist --minify --sourcemap=external
+```
+
+Flags:
+
+- `--config <path>` path to config file
+- `--outDir <path>` output directory (default `dist`)
+- `--clean` remove output directory before build
+- `--minify` minify build output
+- `--sourcemap true|false|inline|external` (default `false`)
+- `--target node18|node20|node22|node24` (default `node18`)
+- `--env <path>` path to env file (replaces default `.env`)
+
+#### start
+
+Start from a production build.
+
+```sh
+tamsi start --outDir dist --env .env.production
+```
+
+Flags:
+
+- `--outDir <path>` build output directory (default `dist`)
+- `--env <path>` path to env file (replaces default `.env`)
+- `--port <number>` port to listen on
+- `--host <string>` host to bind
+- `--quiet` reduce output to only the URL
+- `--health <path>` override health endpoint path
+- `--no-health` disable health endpoint
+
+#### config
+
+Print resolved config (redacted by default).
+
+```sh
+tamsi config --env .env.production --showSources
+```
+
+Flags:
+
+- `--config <path>` path to config file
+- `--env <path>` path to env file (replaces default `.env`)
+- `--raw` print full values without redaction
+- `--showSources` include config source metadata
+
 ## Features
 
 ### tamsi.config.ts
@@ -89,7 +207,7 @@ export default defineTamsiConfig({
 
 // Static-only
 export default defineTamsiConfig({
-  serverStatic: {
+  serveStatic: {
     publicDir: "public",
     publicPath: "/public",
   },
@@ -199,13 +317,7 @@ Asset pipeline example:
 - `pnpm run assets:build`
 - `tamsi build --outDir dist`
 
-Optional flags:
-
-- `--minify`
-- `--sourcemap=true|inline|external`
-- `--target=node20|node22|node24`
-- `--clean`
-- `--env .env.production`
+See the CLI section above for full build flags.
 
 Start from the compiled output:
 
@@ -218,12 +330,7 @@ Notes:
 - `tamsi start` requires `dist/server.mjs`.
 - Use `--clean` with `tamsi build` to remove the output directory before building.
 
-Start flags:
-
-- `--env .env.production` (replaces default `.env`)
-- `--quiet`
-- `--health /healthz`
-- `--no-health`
+See the CLI section above for full start flags.
 
 ### Config introspection
 
